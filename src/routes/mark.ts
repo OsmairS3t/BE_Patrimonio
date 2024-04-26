@@ -30,6 +30,18 @@ export async function markRoutes(app: FastifyInstance) {
     return marks
   })
 
+  app.get('/:codigo', async (request: FastifyRequest) => {
+    const markParamSchema = z.object({
+      codigo: z.string(),
+    })
+    const { codigo } = markParamSchema.parse(request.params)
+    const marks = await knex('marcas')
+      .select()
+      .where('id', codigo)
+      .orderBy('descricao')
+    return marks
+  })
+
   app.post('/', async (request: FastifyRequest, reply: FastifyReply) => {
     const createMarkBodySchema = z.object({
       descricao: z.string(),

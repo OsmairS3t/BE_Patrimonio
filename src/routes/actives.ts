@@ -19,14 +19,18 @@ export async function activeRoutes(app: FastifyInstance) {
     )
 
     let condition = ''
+    let lines = 10
     if (centrocusto !== '0') {
       condition += 'ativos.codcentrocusto=' + centrocusto
+      lines = 500
     }
     if (subgrupo !== '0') {
       if (condition !== '') {
         condition += ' and ativos.codsubgrupo=' + subgrupo
+        lines = 500
       } else {
         condition += 'ativos.codsubgrupo=' + subgrupo
+        lines = 500
       }
     }
     const actives = await knex('ativos')
@@ -36,6 +40,13 @@ export async function activeRoutes(app: FastifyInstance) {
       .innerJoin('subgrupos', 'subgrupos.id', 'ativos.codsubgrupo')
       .innerJoin('centro_custo', 'centro_custo.id', 'ativos.codcentrocusto')
       .whereRaw(`${condition}`)
+      .orderBy([
+        { column: 'codcentrocusto', order: 'asc' },
+        { column: 'subgrupo', order: 'asc' },
+        { column: 'descricao', order: 'asc' },
+        { column: 'codigo', order: 'asc' },
+      ])
+      .limit(lines, { skipBinding: true })
     return actives
   })
 

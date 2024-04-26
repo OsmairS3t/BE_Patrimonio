@@ -1,9 +1,9 @@
 import { knex as configKnex } from 'knex'
-import { env } from './env'
 
 export const knex = configKnex({
   client: 'pg',
   connection: {
-    connectionString: env.DATABASE_CONNECTIONSTRING,
+    connectionString:
+      'postgresql://postgres:postgres@localhost:5433/patrimonio?schema=public',
   },
 })

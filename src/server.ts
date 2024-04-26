@@ -1,6 +1,5 @@
 import fastify from 'fastify'
 import cors from '@fastify/cors'
-import { env } from './env'
 import { groupRoutes } from './routes/groups'
 import { subGroupRoutes } from './routes/subGroups'
 import { markRoutes } from './routes/mark'
@@ -9,7 +8,9 @@ import { activeRoutes } from './routes/actives'
 
 const app = fastify()
 
-app.register(cors)
+app.register(cors, {
+  origin: true,
+})
 
 app.register(groupRoutes, {
   prefix: 'grupos',
@@ -31,6 +32,10 @@ app.register(activeRoutes, {
   prefix: 'ativos',
 })
 
-app.listen({ port: Number(env.SERVER_PORT) }).then(() => {
+// app.listen({ port: 3333 }).then(() => {
+//   console.log('HTTP Server Running!')
+// })
+
+app.listen({ port: 3333, host: '192.168.1.93' }).then(() => {
   console.log('HTTP Server Running!')
 })
