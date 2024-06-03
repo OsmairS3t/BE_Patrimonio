@@ -292,6 +292,40 @@ async function activeRoutes(app2) {
   });
 }
 
+// src/routes/note.ts
+var import_zod6 = require("zod");
+async function noteRoutes(app2) {
+  app2.get("/", async () => {
+    const notes = await knex("notes").select();
+    return notes;
+  });
+  app2.post("/", async (request, reply) => {
+    const lastId = await knex("notes").select().max("id");
+    const noteBodySchema = import_zod6.z.object({
+      costcenterorigin: import_zod6.z.number(),
+      active: import_zod6.z.string(),
+      obs: import_zod6.z.string()
+    });
+    const body = noteBodySchema.parse(request.body);
+    let idNote = lastId[0].max === null ? 1 : Number(lastId[0].max) + 1;
+    await knex("notes").insert({
+      id: idNote,
+      costcenterorigin: body.costcenterorigin,
+      active: body.active,
+      obs: body.obs
+    });
+    return reply.status(201).send();
+  });
+  app2.delete("/:id", async (request, reply) => {
+    const noteParamSchema = import_zod6.z.object({
+      id: import_zod6.z.string()
+    });
+    const { id } = noteParamSchema.parse(request.params);
+    await knex("notes").where("id", id).del();
+    return reply.status(201).send();
+  });
+}
+
 // src/server.ts
 var app = (0, import_fastify.default)();
 app.register(import_cors.default, {
@@ -311,6 +345,9 @@ app.register(costCenterRoutes, {
 });
 app.register(activeRoutes, {
   prefix: "ativos"
+});
+app.register(noteRoutes, {
+  prefix: "notes"
 });
 app.listen({ port: 3333, host: "192.168.1.93" }).then(() => {
   console.log("HTTP Server Running!");

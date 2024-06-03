@@ -110,4 +110,6 @@ export async function activeRoutes(app: FastifyInstance) {
     })
     return reply.status(201).send()
   })
+
+  
 }

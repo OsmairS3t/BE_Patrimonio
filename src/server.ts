@@ -5,6 +5,7 @@ import { subGroupRoutes } from './routes/subGroups'
 import { markRoutes } from './routes/mark'
 import { costCenterRoutes } from './routes/costcenter'
 import { activeRoutes } from './routes/actives'
+import { noteRoutes } from './routes/note'
 
 const app = fastify()
 
@@ -30,6 +31,11 @@ app.register(costCenterRoutes, {
 
 app.register(activeRoutes, {
   prefix: 'ativos',
+})
+
+
+app.register(noteRoutes, {
+  prefix: 'notes',
 })
 
 // app.listen({ port: 3333 }).then(() => {
