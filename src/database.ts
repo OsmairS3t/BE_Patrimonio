@@ -4,6 +4,6 @@ export const knex = configKnex({
   client: 'pg',
   connection: {
     connectionString:
-      'postgresql://postgres:postgres@localhost:5433/patrimonio?schema=public',
+      'postgresql://solutions:sol_fin_2019@192.168.1.6:5435/patrimonio?schema=public',
   },
 })

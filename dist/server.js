@@ -31,7 +31,7 @@ var import_knex = require("knex");
 var knex = (0, import_knex.knex)({
   client: "pg",
   connection: {
-    connectionString: "postgresql://postgres:postgres@localhost:5433/patrimonio?schema=public"
+    connectionString: "postgresql://solutions:sol_fin_2019@192.168.1.6:5435/patrimonio?schema=public"
   }
 });
 
