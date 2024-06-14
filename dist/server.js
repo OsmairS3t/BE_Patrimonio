@@ -166,7 +166,7 @@ async function markRoutes(app2) {
 var import_zod4 = require("zod");
 async function costCenterRoutes(app2) {
   app2.get("/", async () => {
-    const costCenter = await knex("centro_custo").select();
+    const costCenter = await knex("centro_custo").orderBy("centro_custo.descricao", "asc").select();
     return costCenter;
   });
   app2.post("/", async (request, reply) => {
@@ -233,8 +233,8 @@ async function activeRoutes(app2) {
         lines = 500;
       }
     }
-    const actives = await knex("ativos").select(["ativos.*", "subgrupos.descricao as subgrupo"]).select(["ativos.*", "centro_custo.descricao as centrocusto"]).table("ativos").innerJoin("subgrupos", "subgrupos.id", "ativos.codsubgrupo").innerJoin("centro_custo", "centro_custo.id", "ativos.codcentrocusto").whereRaw(`${condition}`).orderBy([
-      { column: "codcentrocusto", order: "asc" },
+    const actives = await knex("ativos").select(["ativos.*", "subgrupos.descricao as subgrupo"]).select(["ativos.*", "centro_custo.descricao as centrocusto"]).select(["ativos.*", "marcas.descricao as marca"]).table("ativos").innerJoin("subgrupos", "subgrupos.id", "ativos.codsubgrupo").innerJoin("centro_custo", "centro_custo.id", "ativos.codcentrocusto").innerJoin("marcas", "marcas.id", "ativos.codmarca").whereRaw(`${condition}`).orderBy([
+      { column: "centro_custo", order: "asc" },
       { column: "subgrupo", order: "asc" },
       { column: "descricao", order: "asc" },
       { column: "codigo", order: "asc" }
@@ -296,7 +296,7 @@ async function activeRoutes(app2) {
 var import_zod6 = require("zod");
 async function noteRoutes(app2) {
   app2.get("/", async () => {
-    const notes = await knex("notes").select();
+    const notes = await knex("notes").select("notes.*", "centro_custo.descricao as centrocusto").innerJoin("centro_custo", "centro_custo.id", "notes.costcenterorigin");
     return notes;
   });
   app2.post("/", async (request, reply) => {
@@ -307,7 +307,7 @@ async function noteRoutes(app2) {
       obs: import_zod6.z.string()
     });
     const body = noteBodySchema.parse(request.body);
-    let idNote = lastId[0].max === null ? 1 : Number(lastId[0].max) + 1;
+    const idNote = lastId[0].max === null ? 1 : Number(lastId[0].max) + 1;
     await knex("notes").insert({
       id: idNote,
       costcenterorigin: body.costcenterorigin,

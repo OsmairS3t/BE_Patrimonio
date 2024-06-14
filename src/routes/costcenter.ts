@@ -4,7 +4,9 @@ import { knex } from '../database'
 
 export async function costCenterRoutes(app: FastifyInstance) {
   app.get('/', async () => {
-    const costCenter = await knex('centro_custo').select()
+    const costCenter = await knex('centro_custo')
+      .orderBy('centro_custo.descricao', 'asc')
+      .select()
     return costCenter
   })
 

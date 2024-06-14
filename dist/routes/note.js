@@ -37,7 +37,7 @@ var knex = (0, import_knex.knex)({
 var import_zod = require("zod");
 async function noteRoutes(app) {
   app.get("/", async () => {
-    const notes = await knex("notes").select();
+    const notes = await knex("notes").select("notes.*", "centro_custo.descricao as centrocusto").innerJoin("centro_custo", "centro_custo.id", "notes.costcenterorigin");
     return notes;
   });
   app.post("/", async (request, reply) => {
@@ -48,7 +48,7 @@ async function noteRoutes(app) {
       obs: import_zod.z.string()
     });
     const body = noteBodySchema.parse(request.body);
-    let idNote = lastId[0].max === null ? 1 : Number(lastId[0].max) + 1;
+    const idNote = lastId[0].max === null ? 1 : Number(lastId[0].max) + 1;
     await knex("notes").insert({
       id: idNote,
       costcenterorigin: body.costcenterorigin,

@@ -33,7 +33,6 @@ app.register(activeRoutes, {
   prefix: 'ativos',
 })
 
-
 app.register(noteRoutes, {
   prefix: 'notes',
 })

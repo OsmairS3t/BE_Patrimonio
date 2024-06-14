@@ -37,7 +37,7 @@ var knex = (0, import_knex.knex)({
 // src/routes/costcenter.ts
 async function costCenterRoutes(app) {
   app.get("/", async () => {
-    const costCenter = await knex("centro_custo").select();
+    const costCenter = await knex("centro_custo").orderBy("centro_custo.descricao", "asc").select();
     return costCenter;
   });
   app.post("/", async (request, reply) => {

@@ -36,12 +36,14 @@ export async function activeRoutes(app: FastifyInstance) {
     const actives = await knex('ativos')
       .select(['ativos.*', 'subgrupos.descricao as subgrupo'])
       .select(['ativos.*', 'centro_custo.descricao as centrocusto'])
+      .select(['ativos.*', 'marcas.descricao as marca'])
       .table('ativos')
       .innerJoin('subgrupos', 'subgrupos.id', 'ativos.codsubgrupo')
       .innerJoin('centro_custo', 'centro_custo.id', 'ativos.codcentrocusto')
+      .innerJoin('marcas', 'marcas.id', 'ativos.codmarca')
       .whereRaw(`${condition}`)
       .orderBy([
-        { column: 'codcentrocusto', order: 'asc' },
+        { column: 'centro_custo', order: 'asc' },
         { column: 'subgrupo', order: 'asc' },
         { column: 'descricao', order: 'asc' },
         { column: 'codigo', order: 'asc' },
@@ -110,6 +112,4 @@ export async function activeRoutes(app: FastifyInstance) {
     })
     return reply.status(201).send()
   })
-
-  
 }

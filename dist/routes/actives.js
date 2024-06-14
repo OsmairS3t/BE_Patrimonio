@@ -77,8 +77,8 @@ async function activeRoutes(app) {
         lines = 500;
       }
     }
-    const actives = await knex("ativos").select(["ativos.*", "subgrupos.descricao as subgrupo"]).select(["ativos.*", "centro_custo.descricao as centrocusto"]).table("ativos").innerJoin("subgrupos", "subgrupos.id", "ativos.codsubgrupo").innerJoin("centro_custo", "centro_custo.id", "ativos.codcentrocusto").whereRaw(`${condition}`).orderBy([
-      { column: "codcentrocusto", order: "asc" },
+    const actives = await knex("ativos").select(["ativos.*", "subgrupos.descricao as subgrupo"]).select(["ativos.*", "centro_custo.descricao as centrocusto"]).select(["ativos.*", "marcas.descricao as marca"]).table("ativos").innerJoin("subgrupos", "subgrupos.id", "ativos.codsubgrupo").innerJoin("centro_custo", "centro_custo.id", "ativos.codcentrocusto").innerJoin("marcas", "marcas.id", "ativos.codmarca").whereRaw(`${condition}`).orderBy([
+      { column: "centro_custo", order: "asc" },
       { column: "subgrupo", order: "asc" },
       { column: "descricao", order: "asc" },
       { column: "codigo", order: "asc" }
