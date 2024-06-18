@@ -261,6 +261,22 @@ async function activeRoutes(app2) {
       codcentrocusto: body.codcentrocusto
     }).where({ id: body.id });
   });
+  app2.put("/:id", async (request) => {
+    const activeParamSchema = import_zod5.z.object({
+      id: import_zod5.z.string()
+    });
+    const activeBodySchema = import_zod5.z.object({ encontrado: import_zod5.z.string() });
+    const { id } = activeParamSchema.parse(request.params);
+    const body = activeBodySchema.parse(request.body);
+    try {
+      await knex("ativos").where({ id: Number(id) }).update({
+        ultima_atualizacao: /* @__PURE__ */ new Date(),
+        encontrado: body.encontrado
+      });
+    } catch (error) {
+      throw error;
+    }
+  });
   app2.post("/", async (request, reply) => {
     const activeBodySchema = import_zod5.z.object({
       codigo: import_zod5.z.string(),

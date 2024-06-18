@@ -83,6 +83,25 @@ export async function activeRoutes(app: FastifyInstance) {
       .where({ id: body.id })
   })
 
+  app.put('/:id', async (request: FastifyRequest) => {
+    const activeParamSchema = z.object({
+      id: z.string()
+    })
+    const activeBodySchema = z.object({ encontrado: z.string() })
+    const { id } = activeParamSchema.parse(request.params)
+    const body = activeBodySchema.parse(request.body)
+    try {
+      await knex('ativos')
+      .where({ id: Number(id) })
+      .update({
+        ultima_atualizacao: new Date(),
+        encontrado: body.encontrado,
+      })
+    } catch (error) {
+      throw error
+    }
+  })
+
   app.post('/', async (request: FastifyRequest, reply: FastifyReply) => {
     const activeBodySchema = z.object({
       codigo: z.string(),

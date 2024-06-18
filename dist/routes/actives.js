@@ -105,6 +105,22 @@ async function activeRoutes(app) {
       codcentrocusto: body.codcentrocusto
     }).where({ id: body.id });
   });
+  app.put("/:id", async (request) => {
+    const activeParamSchema = import_zod.z.object({
+      id: import_zod.z.string()
+    });
+    const activeBodySchema = import_zod.z.object({ encontrado: import_zod.z.string() });
+    const { id } = activeParamSchema.parse(request.params);
+    const body = activeBodySchema.parse(request.body);
+    try {
+      await knex("ativos").where({ id: Number(id) }).update({
+        ultima_atualizacao: /* @__PURE__ */ new Date(),
+        encontrado: body.encontrado
+      });
+    } catch (error) {
+      throw error;
+    }
+  });
   app.post("/", async (request, reply) => {
     const activeBodySchema = import_zod.z.object({
       codigo: import_zod.z.string(),
