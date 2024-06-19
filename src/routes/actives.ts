@@ -45,8 +45,37 @@ export async function activeRoutes(app: FastifyInstance) {
       .orderBy([
         { column: 'centro_custo', order: 'asc' },
         { column: 'subgrupo', order: 'asc' },
-        { column: 'descricao', order: 'asc' },
         { column: 'codigo', order: 'asc' },
+        { column: 'descricao', order: 'asc' },
+      ])
+      .limit(lines, { skipBinding: true })
+    return actives
+  })
+
+  app.get('/listactive/:centrocusto', async (request: FastifyRequest) => {
+    const condictionParamSchema = z.object({
+      centrocusto: z.string().default('0'),
+    })
+    const { centrocusto } = condictionParamSchema.parse(
+      request.params,
+    )
+    let condition = ''
+    let lines = 10
+    if (centrocusto !== '0') {
+      condition += 'ativos.codcentrocusto=' + centrocusto
+      lines = 500
+    }
+    const actives = await knex('ativos')
+      .select(['ativos.*', 'subgrupos.descricao as subgrupo'])
+      .select(['ativos.*', 'centro_custo.descricao as centrocusto'])
+      .select(['ativos.*', 'marcas.descricao as marca'])
+      .table('ativos')
+      .innerJoin('subgrupos', 'subgrupos.id', 'ativos.codsubgrupo')
+      .innerJoin('centro_custo', 'centro_custo.id', 'ativos.codcentrocusto')
+      .innerJoin('marcas', 'marcas.id', 'ativos.codmarca')
+      .whereRaw(`${condition}`)
+      .orderBy([
+        { column: 'codigo', order: 'asc' }
       ])
       .limit(lines, { skipBinding: true })
     return actives
