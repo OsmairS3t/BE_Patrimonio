@@ -169,6 +169,14 @@ async function costCenterRoutes(app2) {
     const costCenter = await knex("centro_custo").orderBy("centro_custo.descricao", "asc").select();
     return costCenter;
   });
+  app2.get("/:id", async (request) => {
+    const createParamSchema = import_zod4.z.object({
+      id: import_zod4.z.string()
+    });
+    const { id } = createParamSchema.parse(request.params);
+    const costCenter = await knex("centro_custo").select("*").where("id", id);
+    return costCenter;
+  });
   app2.post("/", async (request, reply) => {
     const createCenterCostBodySchema = import_zod4.z.object({
       descricao: import_zod4.z.string()
@@ -251,13 +259,22 @@ async function activeRoutes(app2) {
     let condition = "";
     let lines = 10;
     if (centrocusto !== "0") {
-      condition += "ativos.codcentrocusto=" + centrocusto;
+      condition += "ativos.codcentrocusto=" + centrocusto + " and ativos.status <> ";
       lines = 500;
     }
-    const actives = await knex("ativos").select(["ativos.*", "subgrupos.descricao as subgrupo"]).select(["ativos.*", "centro_custo.descricao as centrocusto"]).select(["ativos.*", "marcas.descricao as marca"]).table("ativos").innerJoin("subgrupos", "subgrupos.id", "ativos.codsubgrupo").innerJoin("centro_custo", "centro_custo.id", "ativos.codcentrocusto").innerJoin("marcas", "marcas.id", "ativos.codmarca").whereRaw(`${condition}`).orderBy([
+    const actives = await knex("ativos").select(["ativos.*", "subgrupos.descricao as subgrupo"]).select(["ativos.*", "centro_custo.descricao as centrocusto"]).select(["ativos.*", "marcas.descricao as marca"]).table("ativos").innerJoin("subgrupos", "subgrupos.id", "ativos.codsubgrupo").innerJoin("centro_custo", "centro_custo.id", "ativos.codcentrocusto").innerJoin("marcas", "marcas.id", "ativos.codmarca").where("ativos.codcentrocusto", centrocusto).andWhere("ativos.status", "<>", "Baixado").orderBy([
+      { column: "subgrupo", order: "asc" },
       { column: "codigo", order: "asc" }
     ]).limit(lines, { skipBinding: true });
     return actives;
+  });
+  app2.get("/rel/:codcentrocusto", async (request) => {
+    const activeParamSchema = import_zod5.z.object({
+      codcentrocusto: import_zod5.z.string()
+    });
+    const { codcentrocusto } = activeParamSchema.parse(request.params);
+    const actives = await knex.raw("SELECT ativos.descricao as ativo, Count(ativos.descricao) AS qtde FROM ativos INNER JOIN centro_custo ON ativos.codcentrocusto = centro_custo.id WHERE ativos.codcentrocusto=? GROUP BY ativos.codcentrocusto, centro_custo.descricao, ativos.descricao ORDER BY centro_custo.descricao", [codcentrocusto]);
+    return actives.rows;
   });
   app2.get("/:codigo", async (request) => {
     const activeParamSchema = import_zod5.z.object({

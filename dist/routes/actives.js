@@ -95,13 +95,22 @@ async function activeRoutes(app) {
     let condition = "";
     let lines = 10;
     if (centrocusto !== "0") {
-      condition += "ativos.codcentrocusto=" + centrocusto;
+      condition += "ativos.codcentrocusto=" + centrocusto + " and ativos.status <> ";
       lines = 500;
     }
-    const actives = await knex("ativos").select(["ativos.*", "subgrupos.descricao as subgrupo"]).select(["ativos.*", "centro_custo.descricao as centrocusto"]).select(["ativos.*", "marcas.descricao as marca"]).table("ativos").innerJoin("subgrupos", "subgrupos.id", "ativos.codsubgrupo").innerJoin("centro_custo", "centro_custo.id", "ativos.codcentrocusto").innerJoin("marcas", "marcas.id", "ativos.codmarca").whereRaw(`${condition}`).orderBy([
+    const actives = await knex("ativos").select(["ativos.*", "subgrupos.descricao as subgrupo"]).select(["ativos.*", "centro_custo.descricao as centrocusto"]).select(["ativos.*", "marcas.descricao as marca"]).table("ativos").innerJoin("subgrupos", "subgrupos.id", "ativos.codsubgrupo").innerJoin("centro_custo", "centro_custo.id", "ativos.codcentrocusto").innerJoin("marcas", "marcas.id", "ativos.codmarca").where("ativos.codcentrocusto", centrocusto).andWhere("ativos.status", "<>", "Baixado").orderBy([
+      { column: "subgrupo", order: "asc" },
       { column: "codigo", order: "asc" }
     ]).limit(lines, { skipBinding: true });
     return actives;
+  });
+  app.get("/rel/:codcentrocusto", async (request) => {
+    const activeParamSchema = import_zod.z.object({
+      codcentrocusto: import_zod.z.string()
+    });
+    const { codcentrocusto } = activeParamSchema.parse(request.params);
+    const actives = await knex.raw("SELECT ativos.descricao as ativo, Count(ativos.descricao) AS qtde FROM ativos INNER JOIN centro_custo ON ativos.codcentrocusto = centro_custo.id WHERE ativos.codcentrocusto=? GROUP BY ativos.codcentrocusto, centro_custo.descricao, ativos.descricao ORDER BY centro_custo.descricao", [codcentrocusto]);
+    return actives.rows;
   });
   app.get("/:codigo", async (request) => {
     const activeParamSchema = import_zod.z.object({

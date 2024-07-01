@@ -40,6 +40,14 @@ async function costCenterRoutes(app) {
     const costCenter = await knex("centro_custo").orderBy("centro_custo.descricao", "asc").select();
     return costCenter;
   });
+  app.get("/:id", async (request) => {
+    const createParamSchema = import_zod.z.object({
+      id: import_zod.z.string()
+    });
+    const { id } = createParamSchema.parse(request.params);
+    const costCenter = await knex("centro_custo").select("*").where("id", id);
+    return costCenter;
+  });
   app.post("/", async (request, reply) => {
     const createCenterCostBodySchema = import_zod.z.object({
       descricao: import_zod.z.string()

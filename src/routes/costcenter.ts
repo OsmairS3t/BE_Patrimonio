@@ -10,6 +10,17 @@ export async function costCenterRoutes(app: FastifyInstance) {
     return costCenter
   })
 
+  app.get('/:id', async (request: FastifyRequest) => {
+    const createParamSchema = z.object({
+      id: z.string(),
+    })
+    const { id } = createParamSchema.parse(request.params)
+    const costCenter = await knex('centro_custo')
+      .select('*')
+      .where('id', id)
+    return costCenter
+  })
+
   app.post('/', async (request: FastifyRequest, reply: FastifyReply) => {
     const createCenterCostBodySchema = z.object({
       descricao: z.string(),
