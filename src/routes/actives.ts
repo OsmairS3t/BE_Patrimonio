@@ -76,7 +76,6 @@ export async function activeRoutes(app: FastifyInstance) {
       .where('ativos.codcentrocusto', centrocusto)
       .andWhere('ativos.status','<>','Baixado')
       .orderBy([
-        { column: 'subgrupo', order: 'asc' },
         { column: 'codigo', order: 'asc' }
       ])
       .limit(lines, { skipBinding: true })

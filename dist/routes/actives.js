@@ -99,7 +99,6 @@ async function activeRoutes(app) {
       lines = 500;
     }
     const actives = await knex("ativos").select(["ativos.*", "subgrupos.descricao as subgrupo"]).select(["ativos.*", "centro_custo.descricao as centrocusto"]).select(["ativos.*", "marcas.descricao as marca"]).table("ativos").innerJoin("subgrupos", "subgrupos.id", "ativos.codsubgrupo").innerJoin("centro_custo", "centro_custo.id", "ativos.codcentrocusto").innerJoin("marcas", "marcas.id", "ativos.codmarca").where("ativos.codcentrocusto", centrocusto).andWhere("ativos.status", "<>", "Baixado").orderBy([
-      { column: "subgrupo", order: "asc" },
       { column: "codigo", order: "asc" }
     ]).limit(lines, { skipBinding: true });
     return actives;
